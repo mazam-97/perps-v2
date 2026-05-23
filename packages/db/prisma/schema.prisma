@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrderStatus{
+  Cancelled
+  PartiallyFilled
+  filled
+  Open
+}
+
+model User{
+id                  String @id @default(uuid())
+username            String 
+password            String
+order              Orders?
+makerFill          Fills[] @relation("maker")
+takerFill          Fills[] @relation("taker")
+}
+
+enum Side{
+  Bid
+  Ask
+}
+enum OrderType{
+  Market
+  Limit
+}
+
+model Market{
+  id        String         @id @default(uuid())
+  imageUri  String
+  slug      String
+}
+model Orders{
+  id                String @id @default(uuid())
+  side              Side
+  type              OrderType
+  qty               BigInt
+  price             BigInt
+  filledQty         BigInt
+  slippage          Int
+  market_id         String
+  margin            String
+  makerfills        Fills[]  @relation("maker")
+  takerfills        Fills[]  @relation("taker")    
+  userId            String      @unique 
+  user              User        @relation(fields: [userId], references: [id])
+  status            OrderStatus
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @default(now())
+}
+
+
+model Fills {
+  id                       String @id @default(uuid())
+  makerId                  String
+  takerId                  String
+  market_id                String        
+  filledqty                BigInt
+  makerOrderId             String
+  takerOrderId             String
+  price                    String
+  makerOrders              Orders @relation("maker",fields: [makerOrderId], references: [id])
+  takerOrders              Orders @relation("taker", fields: [takerOrderId], references: [id])
+  makerUser                User @relation("maker",fields: [makerId], references: [id])
+  takerUser                User @relation("taker",fields: [takerId], references: [id])
+}
+
+model Positions{
+  id                      String @id @default(uuid())
+  entryPrice              BigInt 
+  exitPrice               BigInt
+  pnl                     BigInt
+  userId                  String
+  initialMargin           String
+  fundingRate             String
+
+
+}
+

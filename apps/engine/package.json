@@ -1,0 +1,16 @@
+{
+  "name": "engine",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "dependencies": {
+    "commons": "workspace:*",
+    "redis": "^5.12.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
